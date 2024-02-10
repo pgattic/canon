@@ -3,48 +3,87 @@ package main
 import (
 	"fmt"
 	"os"
-
-	//"regexp"
 	"strings"
   "strconv"
 )
 
-func parse_reference(reference string) (book string, chapter string, start_verse int, end_verse int) {
-  splat := strings.Split(reference, ":")
-  book = splat[0]
-  ref_str := splat[1]
 
-  for strings.Contains("1234567890", book[len(book)-1:]) { // Separate the chapter number from book name
-    chapter = string(book[len(book)-1]) + chapter
-    book = book[:len(book)-1]
-  }
-  book = strings.TrimSpace(book)
+/*
 
-  var end_ref_str string
-  if strings.Contains(ref_str, "-") {
-    split := strings.Split(ref_str, "-")
-    ref_str = split[0]
-    end_ref_str = split[1]
-  }
+Note: Commas only separate verses within a chapter, semicolons are used for inter-chapter, inter-book, or inter-canon references.
+Note: In theory, the hyphen could be used to span across chapters, right? Or even to say "1 Nephi 2-3", right? (I won't worry about that now.)
+Note: There shall be no references made across the gap from one book to another. Distinct book references shall be proceeding command-line args.
+The only exception will be when querying an entire canon of scripture, or a group of canons.
 
-  start_verse, err_1 := strconv.Atoi(ref_str)
+*/
 
-  if err_1 != nil {
-    fmt.Println("Dang it")
-    return
-  }
+type ChapReference struct {
+  chapter string
+  verses []int
+}
 
-  var err_2 error
+type BookReference struct {
+  book string
+  chapters []ChapReference
+}
 
-  if end_ref_str != "" {
-    end_verse, err_2 = strconv.Atoi(end_ref_str)
-    if err_2 != nil {
-      fmt.Println("Dang it")
+type CanonReference struct {
+  canon string
+  books []BookReference
+}
+
+type Reference struct {
+  canons []CanonReference
+}
+
+func locate_book(input string) (canon string, book string, locate_err bool) { // TODO: Actually search the filesystem according to book resolving specs
+  canon = "Book of Mormon"
+  book = input
+  locate_err = false
+  return
+}
+
+func resolve_book(segment string) (canon string, book string, rest string, book_res_err bool) {
+  for ch := len(segment)-1; ch >= 0; ch-- { // NOTE: This loop can probably be rewritten as a regex
+    if strings.Contains("1234567890-,[]: ", string(segment[ch])) {
+      rest = string(segment[ch]) + rest
+      segment = segment[:ch] + segment[ch+1:]
+    } else {
+      break
     }
-  } else {
-    end_verse = start_verse
   }
-  return book, chapter, start_verse, end_verse
+  segment = strings.TrimSpace(segment) // Probably optional
+  rest = strings.TrimSpace(rest)
+  // At this point, "1 Nephi 3:7-9" has become "1 Nephi" and "3:7-9" in vars segment and rest
+  var locate_err bool
+  canon, book, locate_err = locate_book(segment)
+  book_res_err = locate_err
+  return
+}
+
+func (r Reference) Parse(reference_str string) {
+  subrefs := strings.Split(reference_str, ";") // on Gospel Library, these subrefs would each show up as separate hyperlinks
+  reference := Reference{}
+  var ctx_canon string
+  var ctx_book string
+  for i := 0; i < len(subrefs); i++ {
+    canon, book, rest, book_res_err := resolve_book(subrefs[i])
+    if book == "" {
+      book = ctx_book;
+    } else {
+      ctx_book = book;
+    }
+    if canon == "" {
+      canon = ctx_canon;
+    } else {
+      ctx_canon = canon;
+    }
+    if book_res_err {
+      fmt.Println("Error: Unable to locate reference")
+      return
+    }
+    reference.canons = append(reference.canons, )
+  }
 }
 
 func main() {

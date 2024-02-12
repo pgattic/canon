@@ -5,7 +5,7 @@ Canon - The extensible book referencer
 
 ## Modules
 
-### Canon
+### Canon (This codebase)
 
 This is the heart of the toolset, and it provides the tooling necessary for managing and reading text.
 
@@ -13,10 +13,10 @@ Provides: `canon`
 
 - Responsible for retrieving text given one reference as an input
 - Can manage "texts", utilizing Git to keep them up-to-date
-  - Stores the text "packages" in ~/.canon/texts/[Package Name]/
-- Can also take highlights as an input (using --hl="[Highlight Data]") and render the text according to the highlight. [TODO: Determine a standard for both storing and passing the highlight data]
+  - Stores the text "packages" in `~/.canon/texts/[Package Name]/` (see the [.canon/texts](#canontexts) section for more info)
+- Can also take highlights as an input (using `--hl="[Highlight Data]"`) and render the text according to the highlight. [TODO: Determine a standard for both storing and passing the highlight data]
 
-### Canon-Mark
+### Canon-Mark (No working implementation)
 
 The annotation manager for Canon.
 
@@ -26,7 +26,7 @@ Provides: `canonmk`
 - Takes a scripture reference as an input, and outputs the same scripture reference along with its relevant highlight data, so as to be piped into `canon`. For example: `canonmk "Matthew 5:14-16"` might output something like `"Matthew 5:14-16" --hl="[Highlight Data]"` [NOTE: It may be better to only output the [Highlight Data]. Think about this?]
 - Has some syntax to add or remove highlights, annotations, and links, whereupon it modifies the annotation library as stored in the user's ~/.canon/marks/ directory (in raw text)
 
-### Canon-Study
+### Canon-Study (No working implementation)
 
 A TUI (Terminal UI) study suite that manages canon text packages and canonmk data, utilizing the features of canon and canonmk
 
@@ -138,4 +138,5 @@ Also, each text is meant to contain its own config.json, which is used to specif
 
 This is meant to help streamline searching for verses from the commandline. With this configuration, commands like `canon "1 John 4:19-20"` can be abbreviated to the much more succinct `canon 1jhn4:19-20`. Note that Canon's use of these aliases is case-insensitive.
 
+Creating a canon text is as simple as organizing it in the structure defined here, and hosting it as a public Git repo. Canon is expected to be able to organize the installation and removal of texts by utilizing git, and assigning them a location in the "priority" attribute of the top-level "config.json".
 

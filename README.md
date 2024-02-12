@@ -3,6 +3,8 @@
 
 Canon - The extensible book referencer
 
+NOTE: A lot of this is just brainstorming. While a functioning implementation of `canon` has been made to retrieve references, it is not yet feature-complete; most of what is specified here has no implementation.
+
 ## Modules
 
 ### Canon (This codebase)
@@ -11,7 +13,7 @@ This is the heart of the toolset, and it provides the tooling necessary for mana
 
 Provides: `canon`
 
-- Responsible for retrieving text given one reference as an input
+- Responsible for retrieving text given one reference as an input, i.e. `canon "Matthew 5:14-16"`.
 - Can manage "texts", utilizing Git to keep them up-to-date
   - Stores the text "packages" in `~/.canon/texts/[Package Name]/` (see the [.canon/texts](#canontexts) section for more info)
 - Can also take highlights as an input (using `--hl="[Highlight Data]"`) and render the text according to the highlight. [TODO: Determine a standard for both storing and passing the highlight data]
@@ -24,7 +26,7 @@ Provides: `canonmk`
 
 - Stores and retrieves canon highlights, annotations, and links, stored in raw-text form
 - Takes a scripture reference as an input, and outputs the same scripture reference along with its relevant highlight data, so as to be piped into `canon`. For example: `canonmk "Matthew 5:14-16"` might output something like `"Matthew 5:14-16" --hl="[Highlight Data]"` [NOTE: It may be better to only output the [Highlight Data]. Think about this?]
-- Has some syntax to add or remove highlights, annotations, and links, whereupon it modifies the annotation library as stored in the user's ~/.canon/marks/ directory (in raw text)
+- Has some syntax to add or remove highlights, annotations, and links, whereupon it modifies the annotation library as stored in the user's `~/.canon/marks/` directory (in raw text)
 
 ### Canon-Study (No working implementation)
 
@@ -36,7 +38,7 @@ Provides: `canonstud`
 
 ### .canon/texts
 
-Installing a text is as simple as running `git clone --depth=1 [git repo]` in the `~/.canon/texts` directory
+Installing a text is to be as simple as running `git clone --depth=1 [git repo]` in the `~/.canon/texts` directory
 
 Here is an example of the structure of a ~/.canon/texts/ directory:
 
@@ -63,7 +65,9 @@ Here is an example of the structure of a ~/.canon/texts/ directory:
     └── config.json
 ```
 
-Each book is a directory as well, containing one ".md" file for each chapter, named after the chapter name; such as `12.md` for chapter 12. The verse numbers are expected to line up with the line numbers of the text documents.
+Each book is a directory as well, containing one ".md" file for each chapter, named after the chapter name; such as `12.md` for chapter 12. Canon's referencing expects the verse numbers to line up with the line numbers of the text documents. 
+
+(NOTE TO SELF: Equating line numbers to verse numbers may be a bad idea for things that aren't verse-based. Consider other potential avenues. Also, calling them "Markdown" files may be inaccurate, as `canon` may never support most features of Markdown syntax.)
 
 Note that each directory has a config.json file. The type of data stored in this file depends on where it is. [NOTE: In the future, this format may change, as JSON may not be the optimal format for this use case]
 

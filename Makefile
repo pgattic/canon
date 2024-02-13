@@ -1,10 +1,16 @@
+NAME=canon
+PREFIX=/usr
 
 all:
 	go build
 
+clean:
+	rm -f ${NAME}
+
 install:
-	mv canon ~/bin/
+	mkdir -p ${DESTDIR}${PREFIX}/bin
+	cp -f ${NAME} ${DESTDIR}${PREFIX}/bin
+	chmod 755 ${DESTDIR}${PREFIX}/bin/${NAME}
 
-.PHONY: all install
-
+.PHONY: all clean install
 

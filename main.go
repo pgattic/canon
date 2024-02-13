@@ -1,12 +1,18 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"strconv"
-	"strings"
+  "fmt"
+  "os"
+  "os/exec"
+  "strconv"
+  "strings"
   "encoding/json"
+  "path/filepath"
 )
+
+type Config struct {
+    Priority []string `json:"priority"`
+}
 
 type Priority struct {
   Priority []string `json:"priority"`
@@ -14,6 +20,69 @@ type Priority struct {
 
 type Aliases struct {
 	Aliases map[string][]string `json:"aliases"`
+}
+
+func gitClone(repoURL string, repoDir string) {
+    // Define the path to the texts directory
+    textsDir := filepath.Join(os.Getenv("HOME"), ".canon", "texts")
+
+    // Ensure the texts directory exists
+//    if err := os.MkdirAll(textsDir, 0755); err != nil {
+//        fmt.Printf("Error creating texts directory: %v\n", err)
+//        return
+//    }
+
+    // Clone the Git repository into the texts directory
+    if err := cloneRepo(repoURL, textsDir + "/" + repoDir); err != nil {
+        fmt.Printf("Error cloning repository: %v\n", err)
+        return
+    }
+
+    // Update the config.json with the repository name
+    configPath := filepath.Join(textsDir, "config.json")
+    if err := updateConfig(configPath, repoDir); err != nil {
+        fmt.Printf("Error updating config.json: %v\n", err)
+        return
+    }
+
+    fmt.Println("Repository cloned successfully and config updated.")
+}
+
+func cloneRepo(repoURL, destination string) error {
+    cmd := exec.Command("git", "clone", repoURL, destination)
+    cmd.Stdout = os.Stdout
+    cmd.Stderr = os.Stderr
+    return cmd.Run()
+}
+
+func updateConfig(configPath, repoName string) error {
+    // Read existing config file
+    file, err := os.ReadFile(configPath)
+    if err != nil {
+        return err
+    }
+
+    // Unmarshal JSON into Config struct
+    var config Config
+    if err := json.Unmarshal(file, &config); err != nil {
+        return err
+    }
+
+    // Update priority attribute
+    config.Priority = append(config.Priority, repoName)
+
+    // Marshal the updated Config struct back to JSON
+    updatedConfig, err := json.MarshalIndent(config, "", "    ")
+    if err != nil {
+        return err
+    }
+
+    // Write the updated JSON to the config file
+    if err := os.WriteFile(configPath, updatedConfig, 0644); err != nil {
+        return err
+    }
+
+    return nil
 }
 
 func resolve_book(input_book string, canon_dir string) (canon string, book string) {
@@ -186,10 +255,16 @@ func main() {
     return
   }
 
-  for i := 1; i < len(args); i++ {
-    print_ref(args[i])
+  if (args[1] == "install") {
+    if len(args) < 4 {
+      fmt.Println("Please specify a repo and a dirname (example: \"canon install https://github.com/user/repo Repo\")")
+    }
+    gitClone(args[2], args[3])
+  } else {
+    for i := 1; i < len(args); i++ {
+      print_ref(args[i])
+    }
   }
-
 }
 
 

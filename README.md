@@ -140,7 +140,7 @@ Also, each text is meant to contain its own config.json, which is used to specif
 }
 ```
 
-This is meant to help streamline searching for verses from the commandline. With this configuration, commands like `canon "1 John 4:19-20"` can be abbreviated to the much more succinct `canon 1jhn4:19-20`. Note that Canon's use of these aliases is case-insensitive.
+This is meant to help streamline searching for verses from the commandline. With this configuration, commands like `canon "1 John 4:19-20"` can be abbreviated to the much more succinct `canon 1jhn4:19-20`. Note that Canon's use of these aliases is case-insensitive. For the study tools, this also provides the order in which the books are meant to appear.
 
 Creating a canon text is as simple as organizing it in the structure defined here, and hosting it as a public Git repo. Canon is expected to be able to organize the installation and removal of texts by utilizing git, and assigning them a location in the "priority" attribute of the top-level "config.json".
 

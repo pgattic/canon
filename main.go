@@ -15,7 +15,7 @@ func main() {
     return
   }
 
-  if (args[1] == "--install" || args[1] == "-i") {
+  if args[1] == "--install" || args[1] == "-i" {
     if len(args) < 4 {
       fmt.Println("Please specify a repo and a dirname (example: \"canon install https://github.com/user/repo Repo\")")
     }

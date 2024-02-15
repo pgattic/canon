@@ -168,7 +168,7 @@ func ParseRef(reference string) {
       }
 
     } else { // no verse referenced, print the entire chapter
-      fs_ref := canon_dir + "/texts/" + canon + "/" + book + "/" + ref + ".md"
+      fs_ref := canon_dir + "/texts/" + canon + "/" + book + "/" + ref
       dat, err := os.ReadFile(fs_ref)
       if err != nil {
         panic(err)

@@ -8,6 +8,10 @@ import (
   "encoding/json"
 )
 
+type Flags struct { // command-line flags
+  VerseNumbers bool // -n
+}
+
 type Priority struct {
   Priority []string `json:"priority"`
 }
@@ -15,6 +19,8 @@ type Priority struct {
 type Aliases struct {
 	Aliases map[string][]string `json:"aliases"`
 }
+
+var execFlags Flags // global since it is referenced all over the place, set in ParseRef()
 
 func resolveBook(input_book string, canon_dir string) (canon string, book string) {
   var priority Priority
@@ -68,112 +74,100 @@ func resolveBook(input_book string, canon_dir string) (canon string, book string
   return
 }
 
-func printEntireBook(canon string, book string) {
-
-}
-
 func printEntireCanon(canon string) {
 
 }
 
-func ParseRef(reference string) {
+func printEntireBook(canon string, book string) {
+
+}
+
+func printChapter(chapter []string) {
+  printVerseRange(1, len(chapter), chapter)
+}
+
+func printVerseRange(startVerse int, endVerse int, sourceContent []string) {
+  for v := startVerse; v <= endVerse; v++ {
+    printVerse(v, sourceContent)
+  }
+}
+
+func printVerse(verse int, sourceContent []string) {
+  if execFlags.VerseNumbers {
+    fmt.Println(strconv.Itoa(verse) + " " + sourceContent[verse-1])
+  } else {
+    fmt.Println(sourceContent[verse-1])
+  }
+}
+
+func ParseRef(reference string, executionFlags Flags) { // Comments will follow the process of parsing "John 3:5,16-17; 14:15"
+  execFlags = executionFlags
   book := reference
-  var rest string
-  for strings.Contains("1234567890 :-,;", book[len(book)-1:]) {
+  rest := ""
+  for strings.Contains("1234567890 :-,;", book[len(book)-1:]) { // "John 3:16-17" -> "John", "3:16-17"
     rest = string(book[len(book)-1]) + rest
     book = book[:len(book)-1]
   }
   rest = strings.TrimSpace(rest)
 
   canon_dir, err := os.UserHomeDir()
-
   if err != nil {
     panic(err)
   }
-
   canon_dir += "/.canon"
 
-  canon, book := resolveBook(book, canon_dir)
+  canon, book := resolveBook(book, canon_dir) // Locate "John" (its canon is not intrinsic)
 
-  if book == "" {
-    printEntireCanon(canon)
-    os.Exit(0)
-  }
-
-  if rest == "" { // no chapters or verses mentioned
+  if rest == "" { // if no chapters or verses mentioned
     printEntireBook(canon, book)
-    os.Exit(0)
+    return
   }
 
-  refs := strings.Split(rest, ";")
+  refs := strings.Split(rest, ";") // "John" "3:5,16-17; 14:15" -> "John" ["3:5,16-17" "14:15"] (NOTE: This feature subject to removal)
 
   for r := 0; r < len(refs); r++ {
     ref := strings.TrimSpace(refs[r])
-    if strings.Contains(ref, ":") { // if specific verse(s) referenced
-      split := strings.Split(ref, ":")
-      if len(split) > 2 {
-        fmt.Println("Syntax Error: Too many colons")
-        fmt.Println("  in \""+ref+"\"")
-        os.Exit(1)
-      }
-      chapter := split[0]
+    split := strings.Split(ref, ":")
+    chapter := split[0]
+    fs_ref := canon_dir + "/texts/" + canon + "/" + book + "/" + chapter
+    dat, err := os.ReadFile(fs_ref)
+    if err != nil {
+      fmt.Println("Error: File not found")
+      fmt.Println("  "+fs_ref)
+      return
+    }
+    chap := strings.Split(strings.TrimSpace(string(dat)), "\n")
 
-      fs_ref := canon_dir + "/texts/" + canon + "/" + book + "/" + chapter
-      dat, err := os.ReadFile(fs_ref)
-      if err != nil {
-        panic(err)
-      }
+    if !strings.Contains(ref, ":") {
+      printChapter(chap)
+      return
+    }
 
-      verse_ranges := strings.Split(split[1], ",")
+    verse_ranges := strings.Split(split[1], ",") // "3" "5,16-17" -> "3" ["5", "16-17"]
 
-      for vr := 0; vr < len(verse_ranges); vr++ {
-        verse_range := strings.TrimSpace(verse_ranges[vr])
-        if strings.Contains(verse_range, "-") {
-          ref_split := strings.Split(verse_range, "-")
-          if len(ref_split) > 2 {
-            fmt.Println("Syntax Error: Too many hyphens")
-            fmt.Println("  in \""+verse_range+"\"")
-            os.Exit(1)
-          }
-          start_verse, err_1 := strconv.Atoi(strings.TrimSpace(ref_split[0]))
-          end_verse, err_2 := strconv.Atoi(strings.TrimSpace(ref_split[1]))
+    for vr := 0; vr < len(verse_ranges); vr++ {
+      verse_range := strings.TrimSpace(verse_ranges[vr])
+      if strings.Contains(verse_range, "-") {
+        ref_split := strings.Split(verse_range, "-")
+        start_verse, err_1 := strconv.Atoi(strings.TrimSpace(ref_split[0]))
+        end_verse, err_2 := strconv.Atoi(strings.TrimSpace(ref_split[1]))
 
-          if err_1 != nil || err_2 != nil {
-            fmt.Println("Syntax Error: Unresolvable verse identifier")
-            fmt.Println("  in \""+verse_range+"\"")
-            return
-          }
-
-          chap := strings.Split(string(dat), "\n")
-
-          result := strings.Join(chap[start_verse-1:end_verse], "\n")
-
-          fmt.Println(result)
-
-        } else {
-          verse, err := strconv.Atoi(strings.TrimSpace(verse_range))
-
-          if err != nil {
-            fmt.Println("Syntax Error: Unresolvable verse identifier")
-            fmt.Println("  in \""+verse_range+"\"")
-            return
-          }
-
-          chap := strings.Split(string(dat), "\n")
-
-          result := chap[verse-1]
-
-          fmt.Println(result)
+        if err_1 != nil || err_2 != nil {
+          fmt.Println("Syntax Error: Unresolvable verse identifier")
+          fmt.Println("  in \""+verse_range+"\"")
+          return
         }
-      }
+        printVerseRange(start_verse, end_verse, chap)
+      } else {
+        verse, err := strconv.Atoi(strings.TrimSpace(verse_range))
 
-    } else { // no verse referenced, print the entire chapter
-      fs_ref := canon_dir + "/texts/" + canon + "/" + book + "/" + ref
-      dat, err := os.ReadFile(fs_ref)
-      if err != nil {
-        panic(err)
+        if err != nil {
+          fmt.Println("Syntax Error: Unresolvable verse identifier")
+          fmt.Println("  in \""+verse_range+"\"")
+          return
+        }
+        printVerse(verse, chap)
       }
-      fmt.Println(strings.TrimSpace(string(dat)))
     }
   }
 }

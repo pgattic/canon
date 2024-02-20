@@ -29,6 +29,8 @@ func main() {
           switch args[i][ch] { // Execution flags
           case 'n': // -n: Line/Verse Numbers
             execFlags.VerseNumbers = true
+          case 'p':
+            execFlags.PrintPath = true
           }
         }
       } else {

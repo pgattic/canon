@@ -10,6 +10,7 @@ import (
 
 type Flags struct { // command-line flags
   VerseNumbers bool // -n
+  PrintPath bool // -p
 }
 
 type Priority struct {
@@ -22,7 +23,7 @@ type Aliases struct {
 
 var execFlags Flags // global since it is referenced all over the place, set in ParseRef()
 
-func resolveBook(input_book string, canon_dir string) (canon string, book string) {
+func resolveBook(input_book string, canon_dir string) (path string) {
   var priority Priority
   // Open the JSON file
   config_f, err := os.Open(canon_dir + "/texts/config.json")
@@ -59,11 +60,11 @@ func resolveBook(input_book string, canon_dir string) (canon string, book string
 
     for book, aliases := range aliases.Aliases {
       if strings.ToLower(book) == strings.ToLower(input_book) {
-        return canon, book
+        return canon + "/" + book
       }
       for _, alias := range aliases {
         if strings.ToLower(alias) == strings.ToLower(input_book) {
-          return canon, book
+          return canon + "/" + book
         }
       }
     }   
@@ -78,7 +79,7 @@ func printEntireCanon(canon string) {
 
 }
 
-func printEntireBook(canon string, book string) {
+func printEntireBook(path string) {
 
 }
 
@@ -94,7 +95,7 @@ func printVerseRange(startVerse int, endVerse int, sourceContent []string) {
 
 func printVerse(verse int, sourceContent []string) {
   if execFlags.VerseNumbers {
-    fmt.Println(strconv.Itoa(verse) + " " + sourceContent[verse-1])
+    fmt.Println(" " + strconv.Itoa(verse) + " " + sourceContent[verse-1])
   } else {
     fmt.Println(sourceContent[verse-1])
   }
@@ -116,10 +117,14 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
   }
   canon_dir += "/.canon"
 
-  canon, book := resolveBook(book, canon_dir) // Locate "John" (its canon is not intrinsic)
+  bookPath := resolveBook(book, canon_dir) // Locate "John" (its canon is not intrinsic)
+
+  if execFlags.PrintPath {
+    fmt.Println(bookPath)
+  }
 
   if rest == "" { // if no chapters or verses mentioned
-    printEntireBook(canon, book)
+    printEntireBook(bookPath)
     return
   }
 
@@ -129,7 +134,7 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
     ref := strings.TrimSpace(refs[r])
     split := strings.Split(ref, ":")
     chapter := split[0]
-    fs_ref := canon_dir + "/texts/" + canon + "/" + book + "/" + chapter
+    fs_ref := canon_dir + "/texts/" + bookPath + "/" + chapter
     dat, err := os.ReadFile(fs_ref)
     if err != nil {
       fmt.Println("Error: File not found")

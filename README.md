@@ -16,7 +16,7 @@ Provides: `canon`
 - Responsible for retrieving text given one reference as an input, i.e. `canon "Matthew 5:14-16"`.
 - Can manage "texts", utilizing Git to keep them up-to-date
   - Stores the text "packages" in `~/.canon/texts/[Package Name]/` (see the [.canon/texts](#canontexts) section for more info)
-- Can also take highlights as an input (using `--hl="[Highlight Data]"`) and render the text according to the highlight. [TODO: Determine a standard for both storing and passing the highlight data]
+- Can output the file location where it found the chapter first (relative to canon's data directory), followed by the verses in comma-separated fashion, so tools like Canon-Mark can identify the source material for the output text and perform more manipulations on it.
 
 ### Canon-Mark (No working implementation)
 
@@ -24,8 +24,7 @@ The annotation manager for Canon.
 
 Provides: `canonmk`
 
-- Stores and retrieves canon highlights, annotations, and links, stored in raw-text form
-- Takes a scripture reference as an input, and outputs the same scripture reference along with its relevant highlight data, so as to be piped into `canon`. For example: `canonmk "Matthew 5:14-16"` might output something like `"Matthew 5:14-16" --hl="[Highlight Data]"` [NOTE: It may be better to only output the [Highlight Data]. Think about this?]
+- Stores and retrieves the locations of canon highlights, annotations, and links
 - Has some syntax to add or remove highlights, annotations, and links, whereupon it modifies the annotation library as stored in the user's `~/.canon/marks/` directory (in raw text)
 
 ### Canon-Study (No working implementation)

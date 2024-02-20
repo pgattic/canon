@@ -15,12 +15,31 @@ func main() {
     return
   }
 
-  if args[1] == "install" {
+  
+  switch args[1] {
+
+  /* Package management arguments */
+  case "install":
     if len(args) < 4 {
       fmt.Println("Please specify a repo and a dirname (example: \"canon install https://github.com/user/repo Repo\")")
+      return
     }
-    manager.GitClone(args[2], args[3])
-  } else {
+    manager.Install(args[2], args[3])
+    return
+  case "remove":
+    if len(args) < 3 {
+      fmt.Println("Please specify a package to remove")
+      return
+    }
+    manager.Remove(args[2])
+    return
+  case "list":
+    manager.List()
+    return
+
+
+  /* reference verse(s) */
+  default:
     var execFlags referencer.Flags
     var refIdx int // index of the args that is the verse index (flags could be before or after the verse ref)
     for i := 1; i < len(args); i++ {

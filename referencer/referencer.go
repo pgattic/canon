@@ -94,6 +94,9 @@ func printVerseRange(startVerse int, endVerse int, sourceContent []string) {
 }
 
 func printVerse(verse int, sourceContent []string) {
+  if execFlags.PrintPath {
+    fmt.Print(">")
+  }
   if execFlags.VerseNumbers {
     fmt.Println(" " + strconv.Itoa(verse) + " " + sourceContent[verse-1])
   } else {
@@ -120,7 +123,7 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
   bookPath := resolveBook(book, canon_dir) // Locate "John" (its canon is not intrinsic)
 
   if execFlags.PrintPath {
-    fmt.Println(bookPath)
+    fmt.Println("@" + bookPath + "/")
   }
 
   if rest == "" { // if no chapters or verses mentioned
@@ -133,13 +136,16 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
   for r := 0; r < len(refs); r++ {
     ref := strings.TrimSpace(refs[r])
     split := strings.Split(ref, ":")
-    chapter := split[0]
+    chapter := strings.TrimSpace(split[0])
     fs_ref := canon_dir + "/texts/" + bookPath + "/" + chapter
     dat, err := os.ReadFile(fs_ref)
     if err != nil {
       fmt.Println("Error: File not found")
       fmt.Println("  "+fs_ref)
       return
+    }
+    if execFlags.PrintPath {
+      fmt.Println("@@" + chapter)
     }
     chap := strings.Split(strings.TrimSpace(string(dat)), "\n")
 
@@ -152,6 +158,10 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
 
     for vr := 0; vr < len(verse_ranges); vr++ {
       verse_range := strings.TrimSpace(verse_ranges[vr])
+
+      if execFlags.PrintPath {
+        fmt.Println("@@@" + verse_range)
+      }
       if strings.Contains(verse_range, "-") {
         ref_split := strings.Split(verse_range, "-")
         start_verse, err_1 := strconv.Atoi(strings.TrimSpace(ref_split[0]))

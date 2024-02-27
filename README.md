@@ -1,145 +1,57 @@
 
-# Canon Toolset [Draft]
+# Canon - An Extensible Book Referencer
 
-Canon - The extensible book referencer
+[Software Demo Video](https://youtu.be/5VAD_pyJUzk)
 
-NOTE: A lot of this is just brainstorming. While a functioning implementation of `canon` has been made to retrieve references, it is not yet feature-complete; most of what is specified here has no implementation.
+## Purpose
 
-## Modules
+As a person of religion, I frequently involve myself in the study of written scripture. Being also a proponent of the [Unix philosophy](https://en.wikipedia.org/wiki/Unix_philosophy), I felt inspired to make a program that facilitates my study of the scriptures, and also tries to keep in line with computer software best practices. I also thought it would be a fun exercise into learning Golang!
 
-### Canon (This codebase)
+## Disclaimer
 
-This is the heart of the toolset, and it provides the tooling necessary for managing and reading text.
+To avoid confusion, I would like to state that though I have my opinions, this program is **not theologically or religiously opinionated**. As a matter of fact, it has potential use cases outside of religion. It comes with no texts pre-installed, and it makes no assumptions about the subject of the text it is querying. It could work with any type of text, as long as it is packaged in the way specified by the SPEC.md document.
 
-Provides: `canon`
+Although I provide the packages for the King James Version New Testament, King James Version Old Testament, Book of Mormon, LDS Doctrine and Covenants, and LDS Pearl of Great Price in their own separate repositories, they are not intended to be the only packages used by this program, and they are not required for its functionality. I encourage you to create packages for any books you may use.
 
-- Responsible for retrieving text given one reference as an input, i.e. `canon "Matthew 5:14-16"`.
-- Can manage "texts", utilizing Git to keep them up-to-date
-  - Stores the text "packages" in `~/.canon/texts/[Package Name]/` (see the [.canon/texts](#canontexts) section for more info)
-- Can output the file location where it found the chapter first (relative to canon's data directory), followed by the verses in comma-separated fashion, so tools like Canon-Mark can identify the source material for the output text and perform more manipulations on it.
+## Usage
 
-### Canon-Mark (No working implementation)
+In order to install this program, you must first have the Go compiler installed.
 
-The annotation manager for Canon.
+1. `git clone https://github.com/pgattic/canon`
+2. `cd canon`
+3. `make`
+4. `sudo make install`
 
-Provides: `canonmk`
+Now, use canon's builtin `install` command to install and index a repository package. Pass in the repo URL, followed by a shortname to use for the directory. For example, this is how I would install my King James Version New Testament package:
 
-- Stores and retrieves the locations of canon highlights, annotations, and links
-- Has some syntax to add or remove highlights, annotations, and links, whereupon it modifies the annotation library as stored in the user's `~/.canon/marks/` directory (in raw text)
+`canon install https://github.com/pgattic/nt-kjv-canon nt`
 
-### Canon-Study (No working implementation)
+References to a paragraph/verse are made with the following syntax: `"[BookName] [Chapter][:[Verse Ranges]]; [Chapter][:[Verse Ranges]]; ..."`, for example, referencing the Book of John, in the 5th, 16th, and 17 verses of chapter 3, and the 15th verse of chapter 14 would be done with `canon "John 3:5,16-17; 14:15"`.
 
-A TUI (Terminal UI) study suite that manages canon text packages and canonmk data, utilizing the features of canon and canonmk
+## Development Environment
 
-Provides: `canonstud`
+In the process of developing this software, I used:
 
-## Standards
+- Neovim (Code editor)
+- Golang (Programming langauge)
 
-### .canon/texts
+## Useful Websites
 
-Installing a text is to be as simple as running `git clone --depth=1 [git repo]` in the `~/.canon/texts` directory
+### Golang
 
-Here is an example of the structure of a ~/.canon/texts/ directory:
+- [Go Cheatsheet](https://devhints.io/go)
+- [Tour of Go](https://go.dev/tour)
 
-```
-~/.canon/texts/
-├── config.json
-├── New Testament
-│   ├── 1 Corinthians
-│   ├── 1 John
-│   ├── 1 Peter
-...
-│   ├── Revelation
-│   ├── Romans
-│   ├── Titus
-│   └── config.json
-└── Old Testament
-    ├── 1 Chronicles
-    ├── 1 Kings
-    ├── 1 Samuel
-...
-    ├── Solomon's Song
-    ├── Zechariah
-    ├── Zephaniah
-    └── config.json
-```
+### Other
 
-Each book is a directory as well, containing one ".md" file for each chapter, named after the chapter name; such as `12.md` for chapter 12. Canon's referencing expects the verse numbers to line up with the line numbers of the text documents. 
+In creating this program, I wanted its usage syntax to be one that the most people would be familiar with, regardless of their background. Although it would be impossible to make it cover all potential shorthands for referencing text, here are some sources that I used for inspiration on the syntax of the references.
 
-(NOTE TO SELF: Equating line numbers to verse numbers may be a bad idea for things that aren't verse-based. Consider other potential avenues. Also, calling them "Markdown" files may be inaccurate, as `canon` may never support most features of Markdown syntax.)
+- [Bible Citation - Wikipedia](https://en.wikipedia.org/wiki/Bible_citation)
+- [How to Cite the Bible - Messiah.edu](https://www.messiah.edu/download/downloads/id/1647/bible_cite.pdf)
+- [The Quran: Word by Word](https://corpus.quran.com/wordbyword.jsp)
+- [Preach My Gospel: Chapter 3, Lesson 4](https://www.churchofjesuschrist.org/study/manual/preach-my-gospel-2023/04-chapter-3/11-chapter-3-lesson-4?lang=eng)
 
-Note that each directory has a config.json file. The type of data stored in this file depends on where it is. [NOTE: In the future, this format may change, as JSON may not be the optimal format for this use case]
+## Progress
 
-As of now, the config.json framework is meant to help `canon` locate the desired book of scripture.
-
-Here is an example top-level config.json:
-
-```
-{
-  "priority": [
-    "Old Testament",
-    "New Testament"
-  ]
-}
-```
-
-This specifies the order in which `canon` searches the children directories for matches on the input book (i.e. "Matthew"). 
-
-This configuration is useful for example if the user has more than one translation of the Bible in their library, or there are other naming collisions, so that there is a consistent, discrete output. 
-
-Also, each text is meant to contain its own config.json, which is used to specify alias names of the books contained therein. For example:
-
-```
-{
-  "aliases": {
-    "Matthew": [
-      "Mat",
-      "Mat."
-    ],
-    "Mark": [
-      "Mar",
-      "Mar.",
-      "Mrk",
-      "Mrk."
-    ],
-    "Luke": [
-      "Luk",
-      "Luk."
-    ],
-    "John": [
-      "Jon",
-      "Jon.",
-      "Jhn",
-      "Jhn."
-    ],
-    "Acts": [
-      "Act",
-      "Act."
-    ],
-...
-    "3 John": [
-      "3Jon",
-      "3 Jon",
-      "3Jon.",
-      "3 Jon.",
-      "3Jhn",
-      "3 Jhn",
-      "3Jhn.",
-      "3 Jhn."
-    ],
-    "Jude": [
-      "Jud",
-      "Jud."
-    ],
-    "Revelation": [
-      "Rev",
-      "Rev."
-    ]
-  }
-}
-```
-
-This is meant to help streamline searching for verses from the commandline. With this configuration, commands like `canon "1 John 4:19-20"` can be abbreviated to the much more succinct `canon 1jhn4:19-20`. Note that Canon's use of these aliases is case-insensitive. For the study tools, this also provides the order in which the books are meant to appear.
-
-Creating a canon text is as simple as organizing it in the structure defined here, and hosting it as a public Git repo. Canon is expected to be able to organize the installation and removal of texts by utilizing git, and assigning them a location in the "priority" attribute of the top-level "config.json".
+This program is currently in a very functional state; however, it still has some progress to make in terms error handling and user comfort. These are things that I hope to improve upon before I feel comfortable listing this as an AUR package or Copr repo.
 

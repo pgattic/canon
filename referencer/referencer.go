@@ -1,50 +1,36 @@
 package referencer
 
 import (
+  "encoding/json"
   "fmt"
   "os"
+  "path/filepath"
   "strconv"
   "strings"
-  "encoding/json"
+  "github.com/pgattic/canon/config"
 )
 
 type Flags struct { // command-line flags
+  Paragraph bool // -p
+  Verbose bool // -v
   VerseNumbers bool // -n
-  PrintPath bool // -p
-}
-
-type Priority struct {
-  Priority []string `json:"priority"`
 }
 
 type Aliases struct {
-	Aliases map[string][]string `json:"aliases"`
+  Aliases map[string][]string `json:"aliases"`
 }
 
 var execFlags Flags // global since it is referenced all over the place, set in ParseRef()
 
-func resolveBook(input_book string, canon_dir string) (path string) {
-  var priority Priority
+func resolveBook(input_book string) (path string) {
   // Open the JSON file
-  config_f, err := os.Open(canon_dir + "/texts/config.json")
-  if err != nil {
-    fmt.Println("Error:", err)
-    return
-  }
-  defer config_f.Close()
-
-  // Decode the JSON file into the struct
-  err = json.NewDecoder(config_f).Decode(&priority)
-  if err != nil {
-    fmt.Println("Error:", err)
-    return
-  }
+  priority := config.LoadConfig()
 
   for _, canon := range priority.Priority {
     var aliases Aliases
 
     // Open the JSON file
-    file, err := os.Open(canon_dir + "/texts/" + canon + "/config.json")
+    file, err := os.Open(filepath.Join(config.TextsDir, canon, "config.json"))
     if err != nil {
       fmt.Println("Error:", err)
       os.Exit(1)
@@ -60,11 +46,11 @@ func resolveBook(input_book string, canon_dir string) (path string) {
 
     for book, aliases := range aliases.Aliases {
       if strings.ToLower(book) == strings.ToLower(input_book) {
-        return canon + "/" + book
+        return filepath.Join(canon, book)
       }
       for _, alias := range aliases {
         if strings.ToLower(alias) == strings.ToLower(input_book) {
-          return canon + "/" + book
+          return filepath.Join(canon, book)
         }
       }
     }   
@@ -76,11 +62,9 @@ func resolveBook(input_book string, canon_dir string) (path string) {
 }
 
 func printEntireCanon(canon string) {
-
 }
 
 func printEntireBook(path string) {
-
 }
 
 func printChapter(chapter []string) {
@@ -94,13 +78,16 @@ func printVerseRange(startVerse int, endVerse int, sourceContent []string) {
 }
 
 func printVerse(verse int, sourceContent []string) {
-  if execFlags.PrintPath {
+  if execFlags.Verbose {
     fmt.Print(">")
   }
   if execFlags.VerseNumbers {
-    fmt.Println(" " + strconv.Itoa(verse) + " " + sourceContent[verse-1])
+    fmt.Println("", verse, sourceContent[verse-1])
   } else {
     fmt.Println(sourceContent[verse-1])
+  }
+  if execFlags.Paragraph {
+    fmt.Println()
   }
 }
 
@@ -114,15 +101,9 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
   }
   rest = strings.TrimSpace(rest)
 
-  canon_dir, err := os.UserHomeDir()
-  if err != nil {
-    panic(err)
-  }
-  canon_dir += "/.canon"
+  bookPath := resolveBook(book) // Locate "John" (its canon is not intrinsic)
 
-  bookPath := resolveBook(book, canon_dir) // Locate "John" (its canon is not intrinsic)
-
-  if execFlags.PrintPath {
+  if execFlags.Verbose {
     fmt.Println("@" + bookPath + "/")
   }
 
@@ -137,14 +118,14 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
     ref := strings.TrimSpace(refs[r])
     split := strings.Split(ref, ":")
     chapter := strings.TrimSpace(split[0])
-    fs_ref := canon_dir + "/texts/" + bookPath + "/" + chapter
+    fs_ref := filepath.Join(config.TextsDir, bookPath, chapter)
     dat, err := os.ReadFile(fs_ref)
     if err != nil {
       fmt.Println("Error: File not found")
       fmt.Println("  "+fs_ref)
       return
     }
-    if execFlags.PrintPath {
+    if execFlags.Verbose {
       fmt.Println("@@" + chapter)
     }
     chap := strings.Split(strings.TrimSpace(string(dat)), "\n")
@@ -159,7 +140,7 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
     for vr := 0; vr < len(verse_ranges); vr++ {
       verse_range := strings.TrimSpace(verse_ranges[vr])
 
-      if execFlags.PrintPath {
+      if execFlags.Verbose {
         fmt.Println("@@@" + verse_range)
       }
       if strings.Contains(verse_range, "-") {

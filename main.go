@@ -3,11 +3,13 @@ package main
 import (
   "fmt"
   "os"
+  "github.com/pgattic/canon/config"
   "github.com/pgattic/canon/manager"
   "github.com/pgattic/canon/referencer"
 )
 
 func main() {
+  config.EnsureSetup()
   args := os.Args
 
   if len(args) < 2 {
@@ -44,12 +46,25 @@ func main() {
     var refIdx int // index of the args that is the verse index (flags could be before or after the verse ref)
     for i := 1; i < len(args); i++ {
       if args[i][0] == '-' {
+        if args[i][1] == '-' { // args starting with "--"
+          switch args[i] {
+          case "--paragraph":
+            execFlags.Paragraph = true
+          case "--verbose":
+            execFlags.Verbose = true
+          case "--numbered":
+            execFlags.VerseNumbers = true
+          }
+          continue
+        }
         for ch := 1; ch < len(args[i]); ch++ {
           switch args[i][ch] { // Execution flags
-          case 'n': // -n: Line/Verse Numbers
-            execFlags.VerseNumbers = true
           case 'p':
-            execFlags.PrintPath = true
+            execFlags.Paragraph = true
+          case 'v':
+            execFlags.Verbose = true
+          case 'n':
+            execFlags.VerseNumbers = true
           }
         }
       } else {

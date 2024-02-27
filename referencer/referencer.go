@@ -56,7 +56,7 @@ func resolveBook(input_book string) (path string) {
     }   
   }
 
-  fmt.Println("Error: Unresolved book name: "+input_book)
+  fmt.Println("Error: Unresolved command or book name:", input_book)
   os.Exit(1)
   return
 }

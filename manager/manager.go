@@ -26,16 +26,22 @@ func updateConfig(repoName string) error {
   return nil
 }
 
-func Install(repoURL string, repoDir string) {
+func getRepoName(url string) string {
+  slashParts := strings.Split(url, "/")
+  return strings.TrimSuffix(slashParts[len(slashParts)-1], ".git")
+}
+
+func Install(repoURL string) {
+  repoName := getRepoName(repoURL)
 
   // Clone the Git repository into the texts directory
-  if err := cloneRepo(repoURL, config.TextsDir + "/" + repoDir); err != nil {
+  if err := cloneRepo(repoURL, config.TextsDir + "/" + repoName); err != nil {
     fmt.Printf("Error cloning repository: %v\n", err)
     return
   }
 
   // Update the config.json with the repository name
-  if err := updateConfig(repoDir); err != nil {
+  if err := updateConfig(repoName); err != nil {
     fmt.Printf("Error updating config.json: %v\n", err)
     return
   }

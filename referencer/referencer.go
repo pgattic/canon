@@ -23,25 +23,21 @@ type Aliases struct {
 var execFlags Flags // global since it is referenced all over the place, set in ParseRef()
 
 func resolveBook(input_book string) (path string) {
-  // Open the JSON file
   priority := config.LoadConfig()
 
   for _, canon := range priority.Priority {
     var aliases Aliases
 
-    // Open the JSON file
-    file, err := os.Open(filepath.Join(config.TextsDir, canon, "config.json"))
+    // Open the canon's config file
+    file, err := os.ReadFile(filepath.Join(config.TextsDir, canon, "config.json"))
     if err != nil {
-      fmt.Println("Error:", err)
-      os.Exit(1)
+      panic(err)
     }
-    defer file.Close()
 
-    // Decode the JSON file into the struct
-    err = json.NewDecoder(file).Decode(&aliases)
-    if err != nil {
-      fmt.Println("Error:", err)
-      os.Exit(1)
+    // Unmarshal data into Aliases struct
+    err_1 := json.Unmarshal(file, &aliases)
+    if err_1 != nil {
+      panic(err_1)
     }
 
     for book, aliases := range aliases.Aliases {
@@ -62,9 +58,11 @@ func resolveBook(input_book string) (path string) {
 }
 
 func printEntireCanon(canon string) {
+  // TODO
 }
 
 func printEntireBook(path string) {
+  // TODO
 }
 
 func printChapter(chapter []string) {
@@ -79,7 +77,7 @@ func printVerseRange(startVerse int, endVerse int, sourceContent []string) {
 
 func printVerse(verse int, sourceContent []string) {
   if execFlags.Verbose {
-    fmt.Print(">")
+    fmt.Print("@@@" + strconv.Itoa(verse) + " ")
   }
   if execFlags.VerseNumbers {
     fmt.Println("", verse, sourceContent[verse-1])
@@ -101,7 +99,7 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
   }
   rest = strings.TrimSpace(rest)
 
-  bookPath := resolveBook(book) // Locate "John" (its canon is not intrinsic)
+  bookPath := resolveBook(book) // Locate what book "John" is in
 
   if execFlags.Verbose {
     fmt.Println("@" + bookPath + "/")
@@ -112,7 +110,7 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
     return
   }
 
-  refs := strings.Split(rest, ";") // "John" "3:5,16-17; 14:15" -> "John" ["3:5,16-17" "14:15"] (NOTE: This feature subject to removal)
+  refs := strings.Split(rest, ";") // "John" "3:5,16-17; 14:15" -> "John" ["3:5,16-17" "14:15"]
 
   for r := 0; r < len(refs); r++ {
     ref := strings.TrimSpace(refs[r])
@@ -121,14 +119,14 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
     fs_ref := filepath.Join(config.TextsDir, bookPath, chapter)
     dat, err := os.ReadFile(fs_ref)
     if err != nil {
-      fmt.Println("Error: File not found")
+      fmt.Println("Error: Chapter not found")
       fmt.Println("  "+fs_ref)
       return
     }
     if execFlags.Verbose {
       fmt.Println("@@" + chapter)
     }
-    chap := strings.Split(strings.TrimSpace(string(dat)), "\n")
+    chap := strings.Split(strings.TrimSpace(string(dat)), "\n") // Entire chapter as a slice of strings
 
     if !strings.Contains(ref, ":") {
       printChapter(chap)
@@ -140,18 +138,18 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
     for vr := 0; vr < len(verse_ranges); vr++ {
       verse_range := strings.TrimSpace(verse_ranges[vr])
 
-      if execFlags.Verbose {
-        fmt.Println("@@@" + verse_range)
-      }
       if strings.Contains(verse_range, "-") {
         ref_split := strings.Split(verse_range, "-")
         start_verse, err_1 := strconv.Atoi(strings.TrimSpace(ref_split[0]))
         end_verse, err_2 := strconv.Atoi(strings.TrimSpace(ref_split[1]))
 
+        if start_verse < 1 {start_verse = 1}
+        if end_verse > len(chap) {end_verse = len(chap)}
+
         if err_1 != nil || err_2 != nil {
           fmt.Println("Syntax Error: Unresolvable verse identifier")
           fmt.Println("  in \""+verse_range+"\"")
-          return
+          os.Exit(1)
         }
         printVerseRange(start_verse, end_verse, chap)
       } else {
@@ -160,9 +158,11 @@ func ParseRef(reference string, executionFlags Flags) { // Comments will follow 
         if err != nil {
           fmt.Println("Syntax Error: Unresolvable verse identifier")
           fmt.Println("  in \""+verse_range+"\"")
-          return
+          os.Exit(1)
         }
-        printVerse(verse, chap)
+        if verse >= 1 && verse <= len(chap) {
+          printVerse(verse, chap)
+        }
       }
     }
   }

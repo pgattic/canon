@@ -15,7 +15,7 @@ func displayHelp() {
   fmt.Println()
   fmt.Println("Commands:")
   fmt.Println("  help                  Display this page")
-  fmt.Println("  install [Repo URL]    Install canon package from repository                   ")
+  fmt.Println("  install [Repo URL]    Install canon package from repository")
   fmt.Println("  list                  List installed Canon packages")
   fmt.Println("  remove [Package]      Remove package by shortname")
   fmt.Println()
@@ -27,14 +27,16 @@ func displayHelp() {
   fmt.Println("  -p, --paragraph       Print the lines of text with an extra space in between")
   fmt.Println("                        them, as paragraphs.")
   fmt.Println("  -v, --verbose         Print extra information, like where the book was found.")
-  fmt.Println("                        Useful for supplementary tools like canonmk.")
+  fmt.Println("                        Useful for supplementary tools like canonmk. It is not")
+  fmt.Println("                        recommended to use -n or -p with -v.")
   fmt.Println()
   fmt.Println("Canon made by Preston Corless (pgattic), free under the MIT License.")
   fmt.Println("More information can be found at https://github.com/pgattic/canon")
 }
 
 func main() {
-  config.EnsureSetup()
+  config.EnsureSetup() // Make sure there is a ~/.canon/texts/config.json file
+
   args := os.Args
 
   if len(args) < 2 {
@@ -42,7 +44,6 @@ func main() {
     fmt.Println("Try \"" + args[0] + " help\" for more information.")
     return
   }
-
   
   switch args[1] {
 

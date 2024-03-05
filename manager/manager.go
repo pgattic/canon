@@ -10,20 +10,19 @@ import (
 )
 
 func cloneRepo(repoURL, destination string) error {
-  cmd := exec.Command("git", "clone", repoURL, destination, "--depth", "1")
+  cmd := exec.Command("git", "clone", repoURL, destination, "--depth", "1") // --depth 1 because the commit history is not useful here
   cmd.Stdout = os.Stdout
   cmd.Stderr = os.Stderr
   return cmd.Run()
 }
 
-func updateConfig(repoName string) error {
+func updateConfig(repoName string) {
   configFile := config.LoadConfig()
 
   // Update priority attribute (put it at the first spot)
   configFile.Priority = append([]string{repoName}, configFile.Priority...)
 
   config.SaveConfig(configFile)
-  return nil
 }
 
 func getRepoName(url string) string {
@@ -41,12 +40,9 @@ func Install(repoURL string) {
   }
 
   // Update the config.json with the repository name
-  if err := updateConfig(repoName); err != nil {
-    fmt.Printf("Error updating config.json: %v\n", err)
-    return
-  }
+  updateConfig(repoName)
 
-  fmt.Println("Repository cloned successfully and config updated.")
+  fmt.Println("Package installed successfully and config updated.")
 }
 
 func Remove(repoDir string) {
@@ -71,7 +67,9 @@ func List() {
   configList := config.LoadConfig().Priority
 
   fmt.Print("\033[36;1m") // Pretty blue color!!1!
-  fmt.Println(strings.Join(configList[:], "\n"))
+  for i := 0; i < len(configList); i++ {
+    fmt.Println(configList[i])
+  }
   fmt.Print("\033[0m")
 }
 

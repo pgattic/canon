@@ -1,8 +1,6 @@
 
 # Canon - An Extensible Book Referencer
 
-[Software Demo Video](https://youtu.be/5VAD_pyJUzk)
-
 ## Purpose
 
 As a person of religion, I frequently involve myself in the study of written scripture. Being also a proponent of the [Unix philosophy](https://en.wikipedia.org/wiki/Unix_philosophy), I felt inspired to make a program that facilitates my study of the scriptures, and also tries to keep in line with computer software best practices. I also thought it would be a fun exercise into learning Golang!
@@ -24,9 +22,17 @@ In order to install this program, you must first have the Go compiler installed.
 
 Now, use canon's builtin `install` command to install and index a repository package. Pass in the repo URL, followed by a shortname to use for the directory. For example, this is how I would install my King James Version New Testament package:
 
-`canon install https://github.com/pgattic/nt-kjv-canon nt`
+`canon install https://github.com/pgattic/nt-kjv-canon`
 
 References to a paragraph/verse are made with the following syntax: `"[BookName] [Chapter][:[Verse Ranges]]; [Chapter][:[Verse Ranges]]; ..."`, for example, referencing the Book of John, in the 5th, 16th, and 17 verses of chapter 3, and the 15th verse of chapter 14 would be done with `canon "John 3:5,16-17; 14:15"`.
+
+### Usage with [Marks](https://github.com/pgattic/marks)
+
+Canon is great for querying text, but its functionality can be extended with highlight support. Canon's "verbose" output can be piped into [Marks](https://github.com/pgattic/marks), which then outputs the marked text to the standard output.
+
+Example: `canon "John 3:5,16-17; 14:15" -v | marks -n`
+
+See the [Marks README](https://github.com/pgattic/marks) for more information.
 
 ## Development Environment
 

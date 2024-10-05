@@ -1,0 +1,16 @@
+[package]
+name = "canon"
+version = "0.1.0"
+authors = ["pgattic <pgattic@gmail.com>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+dioxus = { version = "0.5", features = ["desktop", "router"] }
+libcanon = { git = "https://github.com/pgattic/libcanon.git" }
+
+# Debug
+dioxus-logger = "0.5.1"
+dirs = "5.0.1"

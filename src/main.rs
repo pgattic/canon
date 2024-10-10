@@ -57,7 +57,7 @@ fn ScriptureView(query: String) -> Element {
         }
         Err(problem) => {
             rsx! {
-                p { "Gotta problem?" }
+                p { "Gotta problem? Hello World" }
             }
         }
     }

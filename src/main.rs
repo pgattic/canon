@@ -1,11 +1,13 @@
 #![allow(non_snake_case)]
 
+use dioxus::desktop::WindowBuilder;
 use dirs::home_dir;
 use std::path::PathBuf;
 use dioxus::prelude::*;
-use dioxus_logger::tracing::{info, Level};
+//use dioxus_logger::tracing::{info, Level};
 use libcanon::reference::Reference;
 use libcanon::*;
+use dioxus::desktop::tao::dpi::PhysicalPosition;
 
 #[derive(Clone, Routable, Debug, PartialEq)]
 enum Route {
@@ -17,10 +19,32 @@ enum Route {
 
 fn main() {
     // Init logger
-    dioxus_logger::init(Level::INFO).expect("failed to init logger");
-    info!("starting app");
+    //dioxus_logger::init(Level::INFO).expect("failed to init logger");
+    //info!("starting app");
 
-    dioxus::launch(App);
+    let cfg = dioxus::desktop::Config::new()
+        .with_custom_head(r#"<style>
+            body {
+              margin: 0;
+              overflow-x: hidden;
+              /*padding: 0;*/
+            }
+
+            @media (prefers-color-scheme: dark) {
+              body {
+                background-color: #222222;
+                color: #dddddd;
+              }
+            }
+        </style>"#.to_string())
+        .with_window(
+            WindowBuilder::new()
+                .with_title("Canon")
+                .with_decorations(false)
+                .with_position(PhysicalPosition::new(0, 0)));
+
+    LaunchBuilder::desktop().with_cfg(cfg).launch(App);
+    //dioxus::launch(App);
 }
 
 #[component]
@@ -39,6 +63,28 @@ fn Blog(id: i32) -> Element {
 }
 
 #[component]
+fn PackagesView() -> Element {
+    let canon_path: PathBuf = home_dir().unwrap().join(".canon");
+    
+    let mut pkgs = use_signal(|| pkg_mgr::list(&canon_path).unwrap());
+
+    rsx! {
+        for pkg in pkgs.iter() {
+            span {
+                p {"{pkg}",}
+                //button {
+                //    onclick: |_| {
+                //        pkg_mgr::remove(&pkg, &canon_path);
+                //        pkgs.set(pkg_mgr::list(&canon_path).unwrap());
+                //    },
+                //    "delete",
+                //}
+            }
+        }
+    }
+}
+
+#[component]
 fn ScriptureView(query: String) -> Element {
     let canon_path: PathBuf = home_dir().unwrap().join(".canon");
 
@@ -48,16 +94,23 @@ fn ScriptureView(query: String) -> Element {
     match result {
         Ok(citation) => {
             rsx! {
+                //h1 { "{citation.book_name}" }
                 for ch in citation.chapters {
+                    if ch.entire_chapter {
+                        h2 {
+                            style: "text-align: center",
+                            "Chapter {ch.path.file_name().unwrap().to_str().unwrap()}"
+                        }
+                    }
                     for v in ch.verses {
-                        p { "{v.verse} {v.content}" }
+                        p { b {"{v.verse} "} "{v.content}" }
                     }
                 }
             }
         }
-        Err(problem) => {
+        Err(_problem) => {
             rsx! {
-                p { "Gotta problem? Hello World" }
+                p { "Reference not found" }
             }
         }
     }
@@ -65,20 +118,35 @@ fn ScriptureView(query: String) -> Element {
 
 #[component]
 fn Home() -> Element {
-    let mut count = use_signal(|| 0);
+    let mut query = use_signal(|| String::from("1ne3"));
 
     rsx! {
-        Link {
-            to: Route::Blog {
-                id: count()
-            },
-            "Go to blog"
+        nav {
+            r#style: "
+                position: sticky;
+                top: 0;
+                width: 100%;
+                padding: 8px;
+                background: #444444;
+            ",
+            input {
+                r#style: "
+                    background: #f00;
+                ",
+                r#type: "text",
+                value: "{query}",
+                oninput: move |e| {
+                    query.set(e.value());
+                },
+            }
         }
         div {
-            h1 { "High-Five counter: {count}" }
-            button { onclick: move |_| count += 1, "Up high!" }
-            button { onclick: move |_| count -= 1, "Down low!" }
-            ScriptureView { query: "1ne3" }
+            r#style: "
+                margin: 0 auto;
+                max-width: 800px;
+            ",
+            PackagesView{},
+            ScriptureView { query: "{query}" }
         }
     }
 }

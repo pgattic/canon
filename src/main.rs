@@ -1,12 +1,11 @@
 #![allow(non_snake_case)]
 
+mod components;
+mod pages;
+
+use pages::*;
 use dioxus::desktop::WindowBuilder;
-use dirs::home_dir;
-use std::path::PathBuf;
 use dioxus::prelude::*;
-//use dioxus_logger::tracing::{info, Level};
-use libcanon::reference::Reference;
-use libcanon::*;
 use dioxus::desktop::tao::dpi::PhysicalPosition;
 
 fn main() {
@@ -38,99 +37,48 @@ fn main() {
                 //.with_decorations(false)
                 .with_position(PhysicalPosition::new(0, 0)));
 
-    LaunchBuilder::desktop().with_cfg(cfg).launch(Home);
+    LaunchBuilder::desktop().with_cfg(cfg).launch(App);
 }
 
 #[component]
-fn ScriptureView(query: String, show_numbers: bool) -> Element {
-    let canon_path: PathBuf = home_dir().unwrap().join(".canon").join("texts");
-    //let mut selected_text = use_signal(|| String::from(""));
-
-
-    // Parse the reference
-    let reference = Reference::from_str(&query).unwrap();
-    let result = citation::cite(&canon_path, &reference);
-    match result {
-        Ok(citation) => {
-            rsx! {
-                //p { "Selected text: {selected_text}" }
-                //h1 { "{citation.book_name}" }
-                for ch in citation.chapters.iter() {
-                    if ch.entire_chapter {
-                        h2 {
-                            r#style: "
-                                text-align: center;
-                                font-weight: normal;
-                            ",
-                            "CHAPTER {ch.path.file_name().unwrap().to_str().unwrap()}"
-                        }
-                    }
-                    div {
-                        //onselect: move |e| {
-                        //    selected_text.set(e.)
-                        //}
-                        for v in &ch.verses {
-                            p {
-                                //style: "text-align: justify;",
-                                if show_numbers {
-                                    b {"{v.verse} "} // Verse number
-                                }
-                                span { // Verse content
-                                    r#style: "
-                                        -webkit-user-select: text;
-                                        -ms-user-select: text;
-                                        user-select: text;
-                                    ",
-                                    "{v.content}"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        Err(problem) => {
-            rsx! {
-                p { "Error: {problem}" }
-            }
+fn App() -> Element {
+    rsx! {
+        div {
+            r#style: "
+                margin: 0;
+                display: grid;
+                grid-template-rows: 1fr auto;
+                height: 100vh;
+            ",
+            Router::<Route> {}
+            BottomNavBar {}
         }
     }
 }
 
-#[component]
-fn Home() -> Element {
-    let mut query = use_signal(|| String::from("1ne3"));
-    let mut show_numbers = use_signal(|| true);
+#[derive(Clone, Routable, Debug, PartialEq)]
+pub enum Route {
+    #[route("/")]
+    Reading {},
+    #[route("/search")]
+    Search {},
+}
 
+#[component]
+pub fn BottomNavBar() -> Element {
     rsx! {
         nav {
+            class: "bottom-nav-bar",
             r#style: "
-                position: sticky;
-                top: 0;
                 width: 100%;
-                padding: 8px;
-                background: #444444;
+                height: 60px;
+                background-color: #282c34;
+                color: white;
+                box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
             ",
-            input {
-                //r#style: "
-                //    background: #f00;
-                //",
-                r#type: "text",
-                value: "{query}",
-                oninput: move |e| {query.set(e.value());},
-            }
-            button {
-                onclick: move |_| {show_numbers.toggle();},
-                "Show/hide numbers"
-            }
-        }
-        div {
-            r#style: "
-                margin: 0 auto;
-                max-width: 800px;
-                padding: 0 32px 16px;
-            ",
-            ScriptureView { query: query, show_numbers: show_numbers() }
+            p {"hello"}
+            Link { to: Route::Reading {}, "Home" }
+            Link { to: Route::Search {}, "Search" }
         }
     }
 }

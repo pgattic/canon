@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use crate::components::SearchResultsView;
+use crate::views::SearchResultsView;
 use crate::components::TopBar;
 use crate::Route;
 
@@ -23,6 +23,7 @@ pub fn Search() -> Element {
             },
             content: rsx! {
                 Link { to: Route::Reading {}, "Read" }
+                Link { to: Route::Store {}, "Store" }
                 SearchResultsView { query: query }
             }
         }

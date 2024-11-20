@@ -2,11 +2,14 @@
 
 mod components;
 mod pages;
+mod views;
 
 use pages::*;
 use dioxus::desktop::WindowBuilder;
 use dioxus::prelude::*;
 use dioxus::desktop::tao::dpi::PhysicalPosition;
+
+use crate::components::BottomBar;
 
 fn main() {
     let cfg = dioxus::desktop::Config::new()
@@ -44,15 +47,46 @@ fn main() {
 fn App() -> Element {
     rsx! {
         div {
-            r#style: "
-                margin: 0;
-                display: grid;
-                grid-template-rows: 1fr auto;
-                height: 100vh;
-            ",
-            Router::<Route> {}
-            BottomNavBar {}
+            style: "height: 100vh",
+            div {
+                r#style: "
+                    margin: 0;
+                    display: grid;
+                    grid-template-rows: 1fr auto;
+                    height: 100%;
+                ",
+                div {
+                    style: "overflow: scroll;",
+                    Router::<Route> {}
+                }
+                nav {
+                    r#style: "
+                        width: 100%;
+                        height: 60px;
+                        padding: 8px;
+                        background-color: #282c34;
+                        color: white;
+                        box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+                    ",
+                    p {"hello"}
+                    Link { to: Route::Reading {}, "Home" }
+                    Link { to: Route::Search {}, "Search" }
+                }
+            }
         }
+        //div {
+        //    r#style: "height: 100vh;",
+        //    BottomBar {
+        //        content: rsx! {
+        //            Router::<Route> {}
+        //        },
+        //        bar: rsx! {
+        //            p {"hello"}
+        //            Link { to: Route::Reading {}, "Home" }
+        //            Link { to: Route::Search {}, "Search" }
+        //        }
+        //    }
+        //}
     }
 }
 
@@ -62,24 +96,13 @@ pub enum Route {
     Reading {},
     #[route("/search")]
     Search {},
+    #[route("/store")]
+    Store {},
 }
 
-#[component]
-pub fn BottomNavBar() -> Element {
-    rsx! {
-        nav {
-            class: "bottom-nav-bar",
-            r#style: "
-                width: 100%;
-                height: 60px;
-                background-color: #282c34;
-                color: white;
-                box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
-            ",
-            p {"hello"}
-            Link { to: Route::Reading {}, "Home" }
-            Link { to: Route::Search {}, "Search" }
-        }
-    }
-}
-
+//#[component]
+//pub fn BottomNavBar() -> Element {
+//    rsx! {
+//    }
+//}
+//

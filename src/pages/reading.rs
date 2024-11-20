@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use crate::components::ScriptureView;
+use crate::views::ScriptureView;
 use crate::components::TopBar;
 use crate::Route;
 
@@ -23,6 +23,7 @@ pub fn Reading() -> Element {
             },
             content: rsx! {
                 Link { to: Route::Search {}, "Search" }
+                Link { to: Route::Store {}, "Store" }
                 ScriptureView { query: query, show_numbers: show_numbers() }
             }
         }

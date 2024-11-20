@@ -15,13 +15,14 @@ pub fn TopBar(props: TopBarProps) -> Element {
                 display: grid;
                 grid-template-rows: auto 1fr;
                 min-height: 0;
+                width: 100%;
                 height: 100%;
             ",
             nav {
                 r#style: "
-                    width: 100%;
                     padding: 8px;
                     background: #444444;
+                    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
                 ",
                 {props.bar}
             }

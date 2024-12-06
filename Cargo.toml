@@ -7,10 +7,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-
-dioxus = { version = "0.5", features = ["desktop", "router"] }
+dioxus = { version = "0.6.0-rc.0", features = ["router"] }
 libcanon = { git = "https://github.com/pgattic/libcanon.git" }
-
-# Debug
-dioxus-logger = "0.5.1"
+dioxus-logger = "0.5"
 dirs = "5.0.1"
+
+[features]
+default = ["desktop"]
+desktop = ["dioxus/desktop"]
+mobile = ["dioxus/mobile"]

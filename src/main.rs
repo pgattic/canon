@@ -9,7 +9,7 @@ use dioxus::desktop::WindowBuilder;
 use dioxus::prelude::*;
 use dioxus::desktop::tao::dpi::PhysicalPosition;
 
-use crate::components::BottomBar;
+//use crate::components::BottomBar;
 
 fn main() {
     let cfg = dioxus::desktop::Config::new()

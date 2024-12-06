@@ -5,28 +5,27 @@ use dioxus::prelude::*;
 #[component]
 pub fn SearchResultsView(query: String) -> Element {
     let canon_path: PathBuf = home_dir().unwrap().join(".canon").join("texts");
-    //let mut selected_text = use_signal(|| String::from(""));
 
+    // Time the search function
+    let render_start = std::time::Instant::now();
+    let search_results = if query.len() > 0 {
+        libcanon::search::search(&canon_path, &query)
+    } else {
+        Err("Search something fun!")
+    };
+    let duration = render_start.elapsed();
 
-    // Parse the reference
-    let search_results = if query.len() > 0 {libcanon::search::search(&canon_path, &query)} else { Err("Search something fun!")};
     match search_results {
         Ok(matches) => {
-            //matches[0].re
             rsx! {
-                //p { "Selected text: {selected_text}" }
-                //h1 { "{citation.book_name}" }
+                p { "{matches.len()} results found in {duration.as_secs_f32()} seconds" }
                 for m in matches {
                     div {
-                        //onselect: move |e| {
-                        //    selected_text.set(e.)
-                        //}
                         p {
-                            //style: "text-align: justify;",
                             b {
                                 "{m.reference} "
                             }
-                            span { // Verse content
+                            span {
                                 r#style: "
                                     -webkit-user-select: text;
                                     -ms-user-select: text;

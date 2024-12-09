@@ -1,7 +1,6 @@
 use dioxus::prelude::*;
 use crate::views::StoreView;
 use crate::components::TopBar;
-use crate::Route;
 
 #[component]
 pub fn Store() -> Element {
@@ -12,8 +11,6 @@ pub fn Store() -> Element {
                 p {"Download somethin'!"}
             },
             content: rsx! {
-                Link { to: Route::Reading {}, "Read" }
-                Link { to: Route::Search {}, "Search" }
                 StoreView {}
             }
         }

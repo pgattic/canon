@@ -9,6 +9,7 @@ use pages::*;
 
 #[derive(Clone, Routable, Debug, PartialEq)]
 pub enum Route {
+    #[layout(Navbar)]
     #[route("/")]
     Reading {},
     #[route("/search")]
@@ -28,6 +29,13 @@ fn main() {
 fn App() -> Element {
     rsx! {
         document::Link { rel: "stylesheet", href: MAIN_CSS }
+        Router::<Route> {}
+    }
+}
+
+#[component]
+pub fn Navbar() -> Element {
+    rsx! {
         div {
             style: "height: 100vh",
             div {
@@ -39,7 +47,7 @@ fn App() -> Element {
                 ",
                 div {
                     style: "overflow: scroll;",
-                    Router::<Route> {}
+                    Outlet::<Route> {}
                 }
                 nav {
                     r#style: "
@@ -50,8 +58,9 @@ fn App() -> Element {
                         color: white;
                         box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
                     ",
-                    //Link { to: Route::Reading {}, "Home" }
-                    //Link { to: Route::Search {}, "Search" }
+                    Link { to: Route::Reading {}, "Home" }
+                    Link { to: Route::Search {}, "Search" }
+                    Link { to: Route::Store {}, "Store" }
                 }
             }
         }
@@ -71,9 +80,3 @@ fn App() -> Element {
     }
 }
 
-//#[component]
-//pub fn BottomNavBar() -> Element {
-//    rsx! {
-//    }
-//}
-//

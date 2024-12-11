@@ -21,8 +21,8 @@ pub fn TopBar(props: TopBarProps) -> Element {
             nav {
                 r#style: "
                     padding: 8px;
-                    background: #444444;
-                    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+                    background: #333333;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
                 ",
                 {props.bar}
             }

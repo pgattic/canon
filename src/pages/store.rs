@@ -8,7 +8,7 @@ pub fn Store() -> Element {
     rsx! {
         TopBar {
             bar: rsx! {
-                p {"Download somethin'!"}
+                "Download somethin'!"
             },
             content: rsx! {
                 StoreView {}

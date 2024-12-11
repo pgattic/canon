@@ -1,18 +1,14 @@
-use dirs::home_dir;
-use std::path::PathBuf;
 use libcanon::reference::Reference;
 use libcanon::*;
 use dioxus::prelude::*;
+use crate::constants::canon_home;
 
 #[component]
 pub fn ScriptureView(query: String, show_numbers: bool) -> Element {
-    let canon_path: PathBuf = home_dir().unwrap().join(".canon").join("texts");
-    //let mut selected_text = use_signal(|| String::from(""));
-
 
     // Parse the reference
     let reference = Reference::from_str(&query).unwrap();
-    let result = citation::cite(&canon_path, &reference);
+    let result = citation::cite(&canon_home(), &reference);
     match result {
         Ok(citation) => {
             rsx! {

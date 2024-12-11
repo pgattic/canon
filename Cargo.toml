@@ -17,8 +17,6 @@ default = ["desktop"]
 desktop = ["dioxus/desktop"]
 mobile = ["dioxus/mobile"]
 
-[profile]
-
 [profile.wasm-dev]
 inherits = "dev"
 opt-level = 1
@@ -28,3 +26,8 @@ inherits = "dev"
 
 [profile.android-dev]
 inherits = "dev"
+
+# force vendored openssl on android
+[target.'cfg(target_os = "android")'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
+

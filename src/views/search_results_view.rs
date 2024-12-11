@@ -1,15 +1,13 @@
-use dirs::home_dir;
-use std::path::PathBuf;
 use dioxus::prelude::*;
+use crate::constants::canon_home;
 
 #[component]
 pub fn SearchResultsView(query: String) -> Element {
-    let canon_path: PathBuf = home_dir().unwrap().join(".canon").join("texts");
 
     // Time the search function
     let render_start = std::time::Instant::now();
     let search_results = if query.len() > 0 {
-        libcanon::search::search(&canon_path, &query)
+        libcanon::search::search(&canon_home(), &query)
     } else {
         Err("Search something fun!")
     };

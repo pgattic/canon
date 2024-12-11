@@ -1,25 +1,48 @@
-use dirs::home_dir;
-use std::path::PathBuf;
 use libcanon::*;
 use dioxus::prelude::*;
+use crate::constants::canon_home;
 
 #[component]
 pub fn StoreView() -> Element {
-    let canon_path: PathBuf = home_dir().unwrap().join(".canon").join("texts");
 
-    let installed_packages = pkg_mgr::list(&canon_path);
-    match installed_packages {
-        Ok(pkgs) => {
-            rsx! {
-                for pkg in pkgs {
-                    p {"{pkg}"}
+    let installed_packages = use_signal(|| pkg_mgr::list(&canon_home()).unwrap());
+    let catalogue = pkg_mgr::get_catalogue();
+    let mut install_state = use_signal(|| "".to_string());
+    rsx! {
+        div {
+            style: "max-width: 800px;",
+            h2 { "Installed packages:" }
+            for pkg in installed_packages() {
+                span {
+                    p { "{pkg}" }
+                    button {
+                        onclick: move |_| {let _ = pkg_mgr::remove(&pkg, &canon_home());},
+                        "Delete"
+                    }
                 }
             }
+            h2 { "Catalogue:" }
+            for pkg in catalogue {
+                if !installed_packages().contains(&pkg.0) {
+                    span {
+                        p {"{pkg.0}"}
+                        button {
+                            onclick: move |_| {
+                                //let can_p = canon_path.clone();
+                                install_state.set(format!("Installing {}...", pkg.0));
+                                match pkg_mgr::install(&pkg.1, &canon_home()) {
+            Err(message) => {install_state.set(message.to_string())},
+            _ => {install_state.set(format!("{} installed successfully!", pkg.0))}
         }
-        Err(problem) => {
-            rsx! {
-                p { "Error: {problem}" }
+                                //installed_packages.set(pkg_mgr::list(&can_p).unwrap())
+                            },
+                            "Download",
+                            //onclick: move |_| {show_numbers.toggle();},
+                        }
+                    }
+                }
             }
+            p { "{install_state}" }
         }
     }
 }

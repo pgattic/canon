@@ -2,7 +2,9 @@ use std::path::PathBuf;
 use dirs::home_dir;
 
 pub fn canon_home() -> PathBuf {
-    //PathBuf::from("/data/data/com.pgattic.Canon/texts")
-    home_dir().unwrap().join(".canon").join("texts")
+    #[cfg(target_os = "android")]
+    return PathBuf::from("/data/data/com.pgattic.Canon/texts");
+    #[cfg(not(target_os = "android"))]
+    return home_dir().unwrap().join(".canon").join("texts");
 }
 

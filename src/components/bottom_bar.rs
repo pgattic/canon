@@ -22,10 +22,10 @@ pub fn BottomBar(props: BottomBarProps) -> Element {
             }
             nav {
                 r#style: "
-                    width: 100%;
+                    width: 100vw;
                     height: 60px;
                     padding: 8px;
-                    background-color: #282c34;
+                    background-color: #333333;
                     color: white;
                     box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
                 ",

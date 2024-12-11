@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  overflow-x: hidden;
+  /*overflow-x: hidden;*/
   /*padding: 0;*/
 }
 
@@ -15,5 +15,6 @@ body {
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  /*overflow-x: hidden;*/
 }
 

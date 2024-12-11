@@ -60,7 +60,6 @@ pub fn Navbar() -> Element {
                 }
                 nav {
                     r#style: "
-                        width: 100%;
                         padding: 8px;
                         background-color: #333333;
                         color: white;

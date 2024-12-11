@@ -15,7 +15,7 @@ pub fn TopBar(props: TopBarProps) -> Element {
                 display: grid;
                 grid-template-rows: auto 1fr;
                 min-height: 0;
-                width: 100%;
+                width: 100vw;
                 height: 100%;
             ",
             nav {

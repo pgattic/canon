@@ -10,7 +10,7 @@ pub fn StoreView() -> Element {
     let mut install_state = use_signal(|| "".to_string());
     rsx! {
         div {
-            style: "max-width: 800px;",
+            max_width: "800px",
             h2 { "Installed packages:" }
             for pkg in installed_packages() {
                 span {
@@ -31,13 +31,12 @@ pub fn StoreView() -> Element {
                                 //let can_p = canon_path.clone();
                                 install_state.set(format!("Installing {}...", pkg.0));
                                 match pkg_mgr::install(&pkg.1, &canon_home()) {
-            Err(message) => {install_state.set(message.to_string())},
-            _ => {install_state.set(format!("{} installed successfully!", pkg.0))}
-        }
+                                    Err(message) => {install_state.set(message.to_string())},
+                                    _ => {install_state.set(format!("{} installed successfully!", pkg.0))}
+                                }
                                 //installed_packages.set(pkg_mgr::list(&can_p).unwrap())
                             },
                             "Download",
-                            //onclick: move |_| {show_numbers.toggle();},
                         }
                     }
                 }

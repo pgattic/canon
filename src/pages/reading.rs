@@ -11,7 +11,7 @@ pub fn Reading() -> Element {
         TopBar {
             bar: rsx! {
                 input {
-                    r#type: "text",
+                    type: "text",
                     value: "{query}",
                     oninput: move |e| {query.set(e.value());},
                 }

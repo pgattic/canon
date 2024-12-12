@@ -48,25 +48,21 @@ pub fn Navbar() -> Element {
         div {
             style: "height: 100vh",
             div {
-                r#style: "
-                    margin: 0;
-                    display: grid;
-                    grid-template-rows: 1fr auto;
-                    height: 100%;
-                ",
+                margin: "0",
+                display: "grid",
+                grid_template_rows: "1fr auto",
+                height: "100%",
                 div {
-                    style: "overflow: scroll;",
+                    overflow: "scroll",
                     Outlet::<Route> {}
                 }
                 nav {
-                    r#style: "
-                        padding: 8px;
-                        background-color: #333333;
-                        color: white;
-                        box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
-                        display: flex;
-                        justify-content: space-around;
-                    ",
+                    padding: "8px",
+                    box_shadow: "0 -2px 5px rgba(0,0,0,0.2)",
+                    display: "flex",
+                    justify_content: "space-around",
+                    color: "light-dark(black, white)",
+                    background_color: "light-dark(#dddddd, #333333)",
                     Link { to: Route::Reading {}, "Home" }
                     Link { to: Route::Search {}, "Search" }
                     Link { to: Route::Store {}, "Store" }

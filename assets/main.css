@@ -1,20 +1,15 @@
-body {
-  margin: 0;
-  /*overflow-x: hidden;*/
-  /*padding: 0;*/
+
+:root {
+  color-scheme: light dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #222222;
-    color: #dddddd;
-  }
+body {
+  margin: 0;
 }
 
 * {
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  /*overflow-x: hidden;*/
 }
 

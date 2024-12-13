@@ -20,20 +20,18 @@ pub fn ScriptureView(query: String, show_numbers: bool) -> Element {
                             "CHAPTER {ch.path.file_name().unwrap().to_str().unwrap()}"
                         }
                     }
-                    div {
-                        for v in &ch.verses {
-                            p {
-                                if show_numbers {
-                                    b {"{v.verse} "} // Verse number
-                                }
-                                span { // Verse content
-                                    r#style: "
-                                        -webkit-user-select: text;
-                                        -ms-user-select: text;
-                                        user-select: text;
-                                    ",
-                                    "{v.content}"
-                                }
+                    for v in &ch.verses {
+                        p {
+                            if show_numbers {
+                                b {"{v.verse} "} // Verse number
+                            }
+                            span { // Verse content
+                                r#style: "
+                                    -webkit-user-select: text;
+                                    -ms-user-select: text;
+                                    user-select: text;
+                                ",
+                                "{v.content}"
                             }
                         }
                     }

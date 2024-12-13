@@ -9,7 +9,7 @@ pub fn SearchResultsView(query: String) -> Element {
     let search_results = if query.len() > 0 {
         libcanon::search::search(&canon_home(), &query)
     } else {
-        Err("Search something fun!")
+        Err("Search is case-sensitive")
     };
     let duration = render_start.elapsed();
 
@@ -38,7 +38,7 @@ pub fn SearchResultsView(query: String) -> Element {
         }
         Err(problem) => {
             rsx! {
-                p { "Error: {problem}" }
+                p { "{problem}" }
             }
         }
     }

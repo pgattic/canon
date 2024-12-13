@@ -8,7 +8,7 @@ pub fn Store() -> Element {
     rsx! {
         TopBar {
             bar: rsx! {
-                "Download somethin'!"
+                "Package Management"
             },
             content: rsx! {
                 StoreView {}

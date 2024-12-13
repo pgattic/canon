@@ -13,6 +13,7 @@ pub fn Reading() -> Element {
                 input {
                     type: "text",
                     value: "{query}",
+                    size: 15,
                     oninput: move |e| {query.set(e.value());},
                 }
                 button {

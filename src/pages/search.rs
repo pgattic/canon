@@ -17,7 +17,7 @@ pub fn Search() -> Element {
                 }
                 button {
                     onclick: move |_| {query.set(input.to_string());},
-                    "Search!"
+                    "Search"
                 }
             },
             content: rsx! {

@@ -8,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 dioxus = { version = "0.6.1", features = ["router"] }
-libcanon = { path = "crates/libcanon" }
+libcanon = { git = "https://github.com/pgattic/libcanon.git" }
 dioxus-logger = "0.6.1"
 dirs = "5.0.1"
 

@@ -7,9 +7,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dioxus = { version = "0.6.0", features = ["router"] }
-libcanon = { git = "https://github.com/pgattic/libcanon.git" }
-dioxus-logger = "0.5"
+dioxus = { version = "0.6.1", features = ["router"] }
+libcanon = { path = "crates/libcanon" }
+dioxus-logger = "0.6.1"
 dirs = "5.0.1"
 
 [features]

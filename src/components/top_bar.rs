@@ -19,15 +19,19 @@ pub fn TopBar(props: TopBarProps) -> Element {
             color: "light-dark(black, white)",
             background_color: "light-dark(#ffffff, #222222)",
             nav {
-                padding: "8px",
+                padding: "0 16px",
                 box_shadow: "0 2px 5px rgba(0,0,0,0.2)",
                 background_color: "light-dark(#eeeeee, #333333)",
+                height: "58px",
+                display: "flex",
+                gap: "8px",
+                align_items: "center",
                 {props.bar}
             }
             div {
                 margin: "0 auto",
                 max_width: "800px",
-                padding: "0 32px 16px",
+                padding: "8px 32px",
                 overflow: "scroll",
                 {props.content}
             }

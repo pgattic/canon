@@ -11,9 +11,12 @@ pub fn Reading() -> Element {
         TopBar {
             bar: rsx! {
                 input {
+                    //border: "none",
+                    //background: "none",
+                    padding: "4px",
                     type: "text",
                     value: "{query}",
-                    size: 15,
+                    size: 12,
                     oninput: move |e| {query.set(e.value());},
                 }
                 button {

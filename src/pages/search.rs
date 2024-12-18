@@ -13,6 +13,7 @@ pub fn Search() -> Element {
                 input {
                     r#type: "text",
                     value: "{query}",
+                    padding: "4px",
                     oninput: move |e| {input.set(e.value());},
                 }
                 button {

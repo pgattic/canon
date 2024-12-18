@@ -57,12 +57,14 @@ pub fn Navbar() -> Element {
                     Outlet::<Route> {}
                 }
                 nav {
-                    padding: "8px",
+                    padding: "0 16px",
                     box_shadow: "0 -2px 5px rgba(0,0,0,0.2)",
                     display: "flex",
                     justify_content: "space-around",
                     color: "light-dark(black, white)",
-                    background_color: "light-dark(#dddddd, #333333)",
+                    background_color: "light-dark(#eeeeee, #333333)",
+                    height: "58px",
+                    align_items: "center",
                     Link { to: Route::Reading {}, "Home" }
                     Link { to: Route::Search {}, "Search" }
                     Link { to: Route::Store {}, "Store" }
